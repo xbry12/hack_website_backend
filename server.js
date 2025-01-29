@@ -4,6 +4,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const connectDatabase = require("./config/db"); // Import database configuration.
 const productRoutes = require("./routes/productRoutes"); // Import product routes.
+const userRoutes = require("./routes/userRoutes"); // Import user routes.
 
 dotenv.config(); // Load .env variables
 connectDatabase(); // Connect to MongoDB
@@ -20,10 +21,18 @@ app.use(express.json());
 // Whenever a request starts with /api/products, use productRoutes to handle it.
 app.use("/api/products", productRoutes);
 
+// For user registration/login
+app.use("/api/users", userRoutes);
+
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
-// Use PORT from .env
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  if (process.env.NODE_ENV !== "test") {
+    console.log(`🚀 Server running on port ${PORT}`);
+  }
+});
+
+module.exports = app; // Export the app for testing purposes
