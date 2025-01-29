@@ -22,7 +22,7 @@ app.use(express.json());
 app.use("/api/products", productRoutes);
 
 // For user registration/login
-app.use("/api/auth", userRoutes);
+app.use("/api/users", userRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is running...");

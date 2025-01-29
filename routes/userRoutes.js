@@ -1,8 +1,6 @@
 const express = require("express");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken"); // For JWT token generation
 const User = require("../models/User");
-const { generateToken, matchPassword } = require("../utils/authUtils");
+const { generateToken, matchPassword } = require("../utils/userUtils");
 
 // We created generateToken and matchPassword helper functions in authUtils.js:
 // generateToken: Handles the generation of the JWT token (used in both registration and login).
@@ -28,7 +26,7 @@ const router = express.Router();
 
 // Register a new user
 router.post("/register", async (req, res) => {
-  const { name, email, password } = req.body;
+  const { username, email, password } = req.body;
 
   try {
     // Check if user already exists
@@ -39,7 +37,7 @@ router.post("/register", async (req, res) => {
 
     // Create and save the new user
     const user = new User({
-      name,
+      username,
       email,
       password,
     });
@@ -65,13 +63,17 @@ router.post("/login", async (req, res) => {
     // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res
+        .status(400)
+        .json({ message: "Invalid credentials, user already exists." });
     }
 
     // Compare password with stored hash
     const isMatch = await matchPassword(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res
+        .status(400)
+        .json({ message: "Invalid credentials, incorrect password." });
     }
 
     // Generate a JWT token
