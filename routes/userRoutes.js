@@ -2,6 +2,12 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken"); // For JWT token generation
 const User = require("../models/User");
+const { generateToken, matchPassword } = require("../utils/authUtils");
+
+// We created generateToken and matchPassword helper functions in authUtils.js:
+// generateToken: Handles the generation of the JWT token (used in both registration and login).
+// matchPassword: Compares the entered password with the stored hash (used in login).
+// The logic in the registration and login routes is now much cleaner and reusable.
 
 const router = express.Router();
 
@@ -22,7 +28,7 @@ const router = express.Router();
 
 // Register a new user
 router.post("/register", async (req, res) => {
-  const { username, email, password } = req.body;
+  const { name, email, password } = req.body;
 
   try {
     // Check if user already exists
@@ -31,26 +37,48 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // Create new user
+    // Create and save the new user
     const user = new User({
-      username,
+      name,
       email,
       password,
     });
-
-    // Save the user to the database
     await user.save();
 
-    // Create a JWT token (optional, you can do this during login as well)
-    const token = jwt.sign(
-      { userId: user._id }, // Payload (user ID)
-      process.env.JWT_SECRET, // Secret key (keep it in .env)
-      { expiresIn: "1h" } // Token expiration
-    );
+    // Generate a JWT token
+    const token = generateToken(user._id);
 
-    // Send response
     res.status(201).json({
       message: "User registered successfully",
+      token,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Login a user
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Check if user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    // Compare password with stored hash
+    const isMatch = await matchPassword(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    // Generate a JWT token
+    const token = generateToken(user._id);
+
+    res.json({
+      message: "Login successful",
       token,
     });
   } catch (error) {
