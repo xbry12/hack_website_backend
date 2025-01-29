@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 const connectDatabase = require("./config/db"); // Import database configuration.
 const productRoutes = require("./routes/productRoutes"); // Import product routes.
 const userRoutes = require("./routes/userRoutes"); // Import user routes.
+const orderRoutes = require("./routes/orderRoutes"); // Import order routes
 
 dotenv.config(); // Load .env variables
 connectDatabase(); // Connect to MongoDB
@@ -21,8 +22,11 @@ app.use(express.json());
 // Whenever a request starts with /api/products, use productRoutes to handle it.
 app.use("/api/products", productRoutes);
 
-// For user registration/login
-app.use("/api/users", userRoutes);
+// Use User Routes
+app.use("/api/users", userRoutes); // For user registration/login
+
+// Use Order Routes
+app.use("/api", orderRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is running...");
