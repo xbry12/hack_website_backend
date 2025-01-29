@@ -4,6 +4,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const connectDatabase = require("./config/db"); // Import database configuration.
 const productRoutes = require("./routes/productRoutes"); // Import product routes.
+const userRoutes = require("./routes/userRoutes"); // Import user routes.
 
 dotenv.config(); // Load .env variables
 connectDatabase(); // Connect to MongoDB
@@ -19,6 +20,9 @@ app.use(express.json());
 // Use Product Routes
 // Whenever a request starts with /api/products, use productRoutes to handle it.
 app.use("/api/products", productRoutes);
+
+// For user registration/login
+app.use("/api/auth", userRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is running...");
