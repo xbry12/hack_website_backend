@@ -28,6 +28,11 @@ app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
-// Use PORT from .env
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  if (process.env.NODE_ENV !== "test") {
+    console.log(`🚀 Server running on port ${PORT}`);
+  }
+});
+
+module.exports = app; // Export the app for testing purposes
