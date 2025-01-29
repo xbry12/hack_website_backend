@@ -4,8 +4,8 @@ const request = require("supertest");
 describe("POST /api/users/register", () => {
   it("should register a new user and return a JWT token", async () => {
     const res = await request(app).post("/api/users/register").send({
-      username: "John Doe1",
-      email: "johndoe1@example.com",
+      username: "John Doe2",
+      email: "johndoe2@example.com",
       password: "password123",
     });
 
